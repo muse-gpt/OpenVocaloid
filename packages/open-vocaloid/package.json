@@ -1,0 +1,47 @@
+{
+    "name": "@wae/open-vocaloid",
+    "version": "0.0.1",
+    "description": "Singing-voice synthesis: deterministic formant songs from syllable specs, WAV export",
+    "license": "Apache-2.0",
+    "type": "module",
+    "bin": {
+        "open-vocaloid": "dist/cli.js"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "typecheck": "tsc -p tsconfig.json --noEmit"
+    },
+    "keywords": [
+        "vocaloid",
+        "singing",
+        "voice",
+        "synthesis",
+        "wae"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/muse-gpt/vocaloid.git",
+        "directory": "packages/open-vocaloid"
+    },
+    "optionalDependencies": {
+        "@wae/open-vocaloid-win32-x64": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^22.20.4",
+        "typescript": "^5.9.2"
+    }
+}

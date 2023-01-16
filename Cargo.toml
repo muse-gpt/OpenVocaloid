@@ -1,0 +1,27 @@
+[workspace]
+resolver = "2"
+members = ["crates/napi"]
+default-members = ["crates/napi"]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+authors = ["OpenVocaloid Authors"]
+repository = "https://github.com/muse-gpt/vocaloid"
+
+[workspace.dependencies]
+serde_json = "1"
+# Cross-repo git dependencies must pin the full 40-character revision.
+wae = { git = "https://github.com/doki-land/wae-framework.git", rev = "66f5d003fec85e28503968fd0a6a271beef0f389" }
+# The singing-voice domain, the scene-free voice export entry and the shared
+# sample rate live in the media.rs tree. Local development resolves them by
+# path; the formal git rev pin belongs to the release gate, not a comment here.
+media-voice = { path = "../../多媒体研究/media.rs/projects/media/media.voice" }
+media-render = { path = "../../多媒体研究/media.rs/projects/media/media.render", default-features = false, features = ["voice-export"] }
+media-types = { path = "../../多媒体研究/media.rs/projects/media/media.types" }
+
+[profile.release]
+lto = true
+panic = "abort"

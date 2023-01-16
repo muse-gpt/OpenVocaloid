@@ -1,0 +1,19 @@
+[package]
+name = "openvocaloid-napi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Node-API surface for OpenVocaloid"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+media-voice = { workspace = true }
+media-render = { workspace = true }
+media-types = { workspace = true }
+serde_json = { workspace = true }
+wae = { workspace = true }
