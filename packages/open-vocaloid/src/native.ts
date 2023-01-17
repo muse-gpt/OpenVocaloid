@@ -8,20 +8,31 @@ import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { RenderedSong } from './index.js';
 
 const require = createRequire(import.meta.url);
 
-export interface RenderSongResult {
-    out: string;
-    bytes: number;
+export interface NativeVowelRow {
+    vowel: string;
+    formants: number[];
+}
+
+export interface NativeSongInfo {
     duration_seconds: number;
     syllables: number;
 }
 
+export interface NativeRenderResult extends NativeSongInfo {
+    out: string;
+    bytes: number;
+}
+
 export interface NativeBinding {
     version(): string;
-    renderSong(options: { spec: string; out: string }): RenderSongResult;
+    vowelTable(): NativeVowelRow[];
+    onsetTable(): string[];
+    validateSpec(options: { spec: string }): true;
+    songInfo(options: { spec: string }): NativeSongInfo;
+    renderSong(options: { spec: string; out: string }): NativeRenderResult;
 }
 
 const PLATFORM_PACKAGE = '@wae/open-vocaloid-win32-x64';

@@ -8,6 +8,7 @@
         "build:ts": "pnpm --filter @wae/open-vocaloid run build",
         "build:napi": "cargo build -p openvocaloid-napi --release && node scripts/stage-native.mjs",
         "typecheck": "pnpm --filter @wae/open-vocaloid run typecheck",
-        "demo": "node packages/open-vocaloid/dist/cli.js demo ./out/demo.wav"
+        "demo": "node packages/open-vocaloid/dist/cli/main.js demo --output ./out/demo.wav",
+        "info": "node packages/open-vocaloid/dist/cli/main.js info"
     }
 }

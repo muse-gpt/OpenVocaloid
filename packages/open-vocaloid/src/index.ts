@@ -1,10 +1,14 @@
 /**
- * `@wae/open-vocaloid` — describe a song with a spec, get a sung WAV.
+ * `@wae/open-vocaloid` — vocal synthesis as a library first, CLI second.
  *
  * A song is data: syllables with an onset consonant, a vowel, a pitch and a
  * duration. The same spec and seed always render the same samples. All
  * synthesis, range validation and file encoding run in the native library
  * (the upstream `media.voice` core); this module only types and forwards.
+ *
+ * The exports are orthogonal small functions: inspect the contract
+ * ([`listVowels`] / [`listOnsets`]), check a spec without rendering
+ * ([`validateSong`] / [`songInfo`]), and render ([`renderSong`]).
  */
 import { native } from './native.js';
 
@@ -50,23 +54,60 @@ export interface VoiceSpec {
     seed?: number;
 }
 
-export interface RenderedSong {
-    out: string;
-    bytes: number;
+/** One vowel with its formant centres (F1, F2, F3) in Hz. */
+export interface VowelInfo {
+    vowel: Vowel;
+    formants: [number, number, number];
+}
+
+export interface SongInfo {
     durationSeconds: number;
     syllables: number;
 }
 
+export interface RenderedSong extends SongInfo {
+    out: string;
+    bytes: number;
+}
+
+/** The contracted vowels with formant tables, in canonical order. */
+export function listVowels(): VowelInfo[] {
+    return native.vowelTable().map((row) => ({
+        vowel: row.vowel as Vowel,
+        formants: row.formants as [number, number, number],
+    }));
+}
+
+/** The contracted onset consonant classes, in canonical order. */
+export function listOnsets(): Onset[] {
+    return native.onsetTable() as Onset[];
+}
+
 /**
- * Renders a song spec into a WAV at `out`.
+ * Validates a spec without rendering.
  *
  * Invalid input is rejected, never clamped: an empty lyric, an unknown vowel
  * or onset, an out-of-range pitch/beats/tempo/volume/breath or a non-finite
  * number throws with an `invalid_input:`-prefixed error.
  */
+export function validateSong(spec: VoiceSpec): true {
+    return native.validateSpec({ spec: JSON.stringify(spec) });
+}
+
+/** Derives duration and syllable count from a spec without rendering. */
+export function songInfo(spec: VoiceSpec): SongInfo {
+    const info = native.songInfo({ spec: JSON.stringify(spec) });
+    return { durationSeconds: info.duration_seconds, syllables: info.syllables };
+}
+
+/**
+ * Renders a song spec into a WAV at `out`.
+ *
+ * Throws on invalid input exactly like [`validateSong`]; output directory and
+ * write failures carry an `io:`-prefixed error.
+ */
 export function renderSong(spec: VoiceSpec, out: string): RenderedSong {
     const result = native.renderSong({ spec: JSON.stringify(spec), out });
-    // The native layer speaks snake_case; the author face stays camelCase.
     return {
         out: result.out,
         bytes: result.bytes,

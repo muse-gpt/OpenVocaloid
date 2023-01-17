@@ -1,23 +1,71 @@
 //! Node-API surface for OpenVocaloid.
 //!
-//! Thin binding only: the host sends a [`media_voice::VoiceSpec`] as JSON,
-//! this layer deserializes it with serde and hands it to the scene-free
-//! `media.render` voice export entry, which renders, quantizes to PCM16 and
-//! writes the WAV through `media.codec`. Every domain rule — vowel/onset name
-//! resolution, the range contract, vibrato/breath bounds, the seed default and
-//! the project sample rate — lives upstream; nothing here re-implements,
-//! clamps or swallows them.
+//! Orthogonal small exports — one function per capability, library first:
+//! - [`version`]: binary version for host verification.
+//! - [`vowel_table`] / [`onset_table`]: the contract's capability tables,
+//!   read from the single upstream source (`media.voice`), never hand-copied.
+//! - [`validate_spec`]: check a spec without rendering.
+//! - [`song_info`]: derive duration/syllable count without rendering.
+//! - [`render_song`]: render a spec to a WAV file.
+//!
+//! This layer only maps JS values onto the upstream entries: serde
+//! deserialization of [`media_voice::VoiceSpec`] and the scene-free
+//! `media.render` voice export (render → PCM16 quantize → `media.codec`
+//! write). Every domain rule — vowel/onset resolution, the range contract,
+//! vibrato/breath bounds, the seed default and the project sample rate —
+//! lives upstream; nothing here re-implements, clamps or swallows them.
 
 #![deny(missing_docs)]
 
 use media_types::SAMPLE_RATE;
-use media_voice::VoiceSpec;
+use media_voice::{Onset, VoiceSpec, Vowel};
 use wae::{CallContext, Env, Error, JsValue, Result, function, register_module};
 
 /// Library version used by `@wae/open-vocaloid` to verify the native binary.
 #[function]
 fn version(ctx: CallContext) -> Result<JsValue> {
     ctx.env().string(env!("CARGO_PKG_VERSION"))
+}
+
+/// The contracted vowels with their formant tables, in canonical order.
+#[function(js_name = "vowelTable")]
+fn vowel_table(ctx: CallContext) -> Result<JsValue> {
+    let rows: Vec<serde_json::Value> = Vowel::ALL
+        .iter()
+        .map(|vowel| serde_json::json!({ "vowel": vowel.as_str(), "formants": vowel.formants() }))
+        .collect();
+    json_to_js(ctx.env(), &serde_json::Value::Array(rows))
+}
+
+/// The contracted onset consonant classes, in canonical order.
+#[function(js_name = "onsetTable")]
+fn onset_table(ctx: CallContext) -> Result<JsValue> {
+    let names: Vec<serde_json::Value> = Onset::ALL
+        .iter()
+        .map(|onset| serde_json::Value::String(onset.as_str().to_owned()))
+        .collect();
+    json_to_js(ctx.env(), &serde_json::Value::Array(names))
+}
+
+/// Validates a spec without rendering. Returns `{ ok: true }` or throws with
+/// the stable `invalid_input:` prefix.
+#[function(js_name = "validateSpec")]
+fn validate_spec(ctx: CallContext) -> Result<JsValue> {
+    let spec = read_spec(&ctx)?;
+    spec.validate().map_err(map_domain_error)?;
+    ctx.env().boolean(true)
+}
+
+/// Derives duration and syllable count from a spec without rendering.
+#[function(js_name = "songInfo")]
+fn song_info(ctx: CallContext) -> Result<JsValue> {
+    let spec = read_spec(&ctx)?;
+    spec.validate().map_err(map_domain_error)?;
+    let value = serde_json::json!({
+        "duration_seconds": spec.duration_seconds(),
+        "syllables": spec.syllables.len(),
+    });
+    json_to_js(ctx.env(), &value)
 }
 
 /// Renders a song spec into a WAV file.
@@ -32,15 +80,14 @@ fn version(ctx: CallContext) -> Result<JsValue> {
 /// through this binding.
 #[function(js_name = "renderSong")]
 fn render_song(ctx: CallContext) -> Result<JsValue> {
-    let arg = ctx
+    let spec = read_spec(&ctx)?;
+    let out = ctx
         .args()
         .first()
         .copied()
-        .ok_or_else(|| Error::new("renderSong requires an options object"))?;
-    let out = arg.get_named("out")?.as_string()?;
-    let spec_json = arg.get_named("spec")?.as_string()?;
-    let spec: VoiceSpec = serde_json::from_str(&spec_json)
-        .map_err(|e| map_domain_error(media_types::Error::invalid_input(format!("spec: {e}"))))?;
+        .ok_or_else(|| Error::new("renderSong requires an options object"))?
+        .get_named("out")?
+        .as_string()?;
 
     if let Some(parent) = std::path::Path::new(&out).parent() {
         if !parent.as_os_str().is_empty() {
@@ -59,6 +106,20 @@ fn render_song(ctx: CallContext) -> Result<JsValue> {
         "syllables": spec.syllables.len(),
     });
     json_to_js(ctx.env(), &value)
+}
+
+/// Reads the `{ spec: string }` option object and deserializes it with the
+/// upstream serde shape. Unknown vowels/onsets and malformed JSON reject
+/// explicitly; no fallback.
+fn read_spec(ctx: &CallContext) -> Result<VoiceSpec> {
+    let arg = ctx
+        .args()
+        .first()
+        .copied()
+        .ok_or_else(|| Error::new("a spec JSON is required"))?;
+    let spec_json = arg.get_named("spec")?.as_string()?;
+    serde_json::from_str::<VoiceSpec>(&spec_json)
+        .map_err(|e| map_domain_error(media_types::Error::invalid_input(format!("spec: {e}"))))
 }
 
 /// Maps a `media.types` domain error onto a host error, keeping the stable
@@ -97,4 +158,4 @@ fn json_to_js(env: Env, value: &serde_json::Value) -> Result<JsValue> {
     }
 }
 
-register_module![version, render_song];
+register_module![version, vowel_table, onset_table, validate_spec, song_info, render_song];
