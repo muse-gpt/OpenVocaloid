@@ -16,12 +16,13 @@ serde_json = "1"
 # Cross-repo git dependencies must pin the full 40-character revision.
 wae = { git = "https://github.com/doki-land/wae-framework.git", rev = "66f5d003fec85e28503968fd0a6a271beef0f389" }
 # The singing-voice domain, the scene-free voice export entry and the shared
-# sample rate live in the media.rs tree. Local development resolves them by
-# path; the formal git rev pin belongs to the release gate, not a comment here.
-media-voice = { path = "../../多媒体研究/media.rs/projects/media/media.voice" }
-media-render = { path = "../../多媒体研究/media.rs/projects/media/media.render", default-features = false, features = ["voice-export"] }
-media-types = { path = "../../多媒体研究/media.rs/projects/media/media.types" }
+# sample rate live in the media.rs tree. The revision is pinned to a full
+# 40-character commit so this repo builds from exactly one upstream source.
+media-voice = { git = "https://github.com/oovm/boost.rs.git", rev = "c4ad7e17499170b38df42847996cdfe55bf58d38" }
+media-render = { git = "https://github.com/oovm/boost.rs.git", rev = "c4ad7e17499170b38df42847996cdfe55bf58d38", default-features = false, features = ["voice-export"] }
+media-types = { git = "https://github.com/oovm/boost.rs.git", rev = "c4ad7e17499170b38df42847996cdfe55bf58d38" }
 
 [profile.release]
 lto = true
 panic = "abort"
+

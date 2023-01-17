@@ -71,8 +71,9 @@ fn song_info(ctx: CallContext) -> Result<JsValue> {
 /// Renders a song spec into a WAV file.
 ///
 /// Argument: `{ out: string, spec: string }` — the spec is JSON in the
-/// `media.voice` shape (lowercase `vowel`/`onset` names, camelCase fields,
-/// `seed` defaulting to 1). An empty lyric, an unknown vowel or onset, an
+/// JS authoring shape (lowercase `vowel`/`onset` names, camelCase keys,
+/// `seed` defaulting to 1) and is mapped to the domain's snake_case fields
+/// by this binding. An empty lyric, an unknown vowel or onset, an
 /// out-of-range pitch/beats/tempo/volume/breath and non-finite values reject
 /// with the stable `invalid_input:` prefix; output directory and write
 /// failures keep their `io:` code. The sample rate is the project default
@@ -109,8 +110,10 @@ fn render_song(ctx: CallContext) -> Result<JsValue> {
 }
 
 /// Reads the `{ spec: string }` option object and deserializes it with the
-/// upstream serde shape. Unknown vowels/onsets and malformed JSON reject
-/// explicitly; no fallback.
+/// upstream serde shape. The spec arrives in JS style (camelCase) and is
+/// mapped to the domain's snake_case fields here — `media.voice` keeps Rust
+/// native names for every other language binding. Unknown vowels/onsets and
+/// malformed JSON reject explicitly; no fallback.
 fn read_spec(ctx: &CallContext) -> Result<VoiceSpec> {
     let arg = ctx
         .args()
@@ -118,8 +121,34 @@ fn read_spec(ctx: &CallContext) -> Result<VoiceSpec> {
         .copied()
         .ok_or_else(|| Error::new("a spec JSON is required"))?;
     let spec_json = arg.get_named("spec")?.as_string()?;
-    serde_json::from_str::<VoiceSpec>(&spec_json)
+    let value: serde_json::Value = serde_json::from_str(&spec_json)
+        .map_err(|e| map_domain_error(media_types::Error::invalid_input(format!("spec: {e}"))))?;
+    serde_json::from_value::<VoiceSpec>(snake_keys(value))
         .map_err(|e| map_domain_error(media_types::Error::invalid_input(format!("spec: {e}"))))
+}
+
+/// Recursively maps JS-style camelCase keys to the domain's snake_case keys.
+fn snake_keys(value: serde_json::Value) -> serde_json::Value {
+    match value {
+        serde_json::Value::Object(map) => serde_json::Value::Object(
+            map.into_iter().map(|(key, inner)| (camel_to_snake(&key), snake_keys(inner))).collect(),
+        ),
+        serde_json::Value::Array(items) => serde_json::Value::Array(items.into_iter().map(snake_keys).collect()),
+        other => other,
+    }
+}
+
+fn camel_to_snake(key: &str) -> String {
+    let mut out = String::with_capacity(key.len() + 4);
+    for letter in key.chars() {
+        if letter.is_ascii_uppercase() {
+            out.push('_');
+            out.push(letter.to_ascii_lowercase());
+        } else {
+            out.push(letter);
+        }
+    }
+    out
 }
 
 /// Maps a `media.types` domain error onto a host error, keeping the stable
