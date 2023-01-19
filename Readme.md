@@ -1,18 +1,32 @@
-# OpenVocaloid — 人声合成产品
+# OpenVocaloid — vocal synthesis product
 
-**泛指人声合成，不限于 VOCALOID 复刻。** 与 [OpenSFX](../OpenSFX)（参数化音效合成）成对：一个合成人声，一个合成音效。
+**Vocal synthesis in the broad sense, not a VOCALOID clone.** Paired with
+[OpenSFX](../OpenSFX) (procedural sound effects): one synthesizes voices, the
+other synthesizes effects.
 
-## 定位
+## Positioning
 
-「VOCALOID」在大众语境里长期被当作“电子歌声合成”的代名词，但那只是狭义——用 VOCALOID 软件制作的作品。事实上电子歌声合成的技术路线很多：UTAU、CeVIO、Synthesizer V、NEUTRINO、VOCALOID 6 AI……广义上，凡是商业歌声合成软件（含 AI 引擎）制作的作品都属于同一领域；而 UTAU 声库、人力 VOCALOID、AI 语音转换（SVC）则来自“自行提取素材”的另一条脉络。
+In everyday usage "VOCALOID" became a synonym for synthesized singing, but that
+is only the narrow sense — works made with that one piece of software. Electronic
+singing has many technical routes: UTAU, CeVIO, Synthesizer V, NEUTRINO,
+VOCALOID 6 AI, and so on. Broadly, every commercial singing-synthesis product
+(including AI engines) belongs to the same field, while UTAU voice banks,
+hand-made VOCALOID and AI singing-voice conversion (SVC) come from the other
+lineage where people extract and splice their own material.
 
-OpenVocaloid 不复刻任何单一软件，而是建设**引擎无关的人声合成产品**：
+OpenVocaloid does not clone any single product; it builds an **engine-agnostic
+vocal synthesis product**:
 
-- **输入合同**：乐谱/音符时值、歌词（音节：辅音类 × 元音 × 音高 × 时值）、音高与表现控制（vibrato、breath）。
-- **引擎后端（可插拔）**：当前交付的是共鸣峰（formant）类别合成——确定性、零素材依赖、合同全在 Rust；后续按真实选型接入神经声库或 SVC 类后端。
-- **诚实边界**：formant 合成 ≠ 真人级歌声；每个后端的控制参数逐项关联其真实支持范围，禁止用参数名伪装能力。
+- **Input contract**: score and note durations, lyrics as syllables (onset class
+  × vowel × pitch × beats), plus expression controls (vibrato, breath).
+- **Pluggable engine backends**: the current delivery is formant category
+  synthesis — deterministic, zero-asset, with the whole contract in Rust. Neural
+  voice banks or SVC-style backends can be added after a real selection process.
+- **Honest boundary**: formant synthesis is not human-level singing, and each
+  backend's controls map to what that backend actually supports — parameter
+  names never pretend capability.
 
-## 使用
+## Usage
 
 ```bash
 pnpm build
@@ -23,7 +37,7 @@ node packages/open-vocaloid/dist/cli/main.js validate ./song.json
 node packages/open-vocaloid/dist/cli/main.js info
 ```
 
-作为库（正交小函数）：
+As a library (small orthogonal functions):
 
 ```ts
 import { renderSong, validateSong, songInfo, listVowels, listOnsets } from '@wae/open-vocaloid';
@@ -36,10 +50,18 @@ validateSong(spec);
 renderSong(spec, './out/song.wav');
 ```
 
-## 架构
+## Architecture
 
-- 领域核心在共享 `media.*` 上游的 `media.voice`（音节合同、共振峰引擎、确定性渲染）与 `media.render`（`voice-export`：渲染 + PCM16 量化 + `media.codec` 写 WAV）。
-- CLI 的 `--seed` / `--tempo` / `--volume` 只是对 spec 的显式覆盖，范围校验仍在 Rust（越界返回 `invalid_input`）。
-- 本仓只保留薄绑定（Node-API）、TS 作者面、CLI（`@wae/commander` 命令树）与平台包。
-- 合同：范围校验在 Rust（`invalid_input`，禁止绑定层钳制）；同 spec+seed 字节级复现；元音/辅音名 kebab-case 唯一拼写。
-- 许可证：Apache-2.0。
+- The domain core lives upstream in the shared `media.*` tree: `media.voice`
+  (syllable contract, formant engine, deterministic rendering) and
+  `media.render` (`voice-export`: render + PCM16 quantization + WAV through
+  `media.codec`).
+- `--seed` / `--tempo` / `--volume` are explicit overrides on top of the spec;
+  range validation stays in Rust (out-of-range returns `invalid_input`).
+- This repository keeps only the thin binding (Node-API), the TypeScript
+  authoring surface, the CLI (`@wae/commander` command tree) and the platform
+  package.
+- Contract: range validation in Rust (`invalid_input`, no clamping in the
+  binding), byte-identical output for the same spec and seed, single kebab-case
+  spelling for vowel and onset names.
+- License: Apache-2.0.
