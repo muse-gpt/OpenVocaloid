@@ -18,6 +18,7 @@ OpenVocaloid 不复刻任何单一软件，而是建设**引擎无关的人声�
 pnpm build
 node packages/open-vocaloid/dist/cli/main.js demo --output ./out/demo.wav
 node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav
+node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav --seed 2 --tempo 100 --volume 0.5
 node packages/open-vocaloid/dist/cli/main.js validate ./song.json
 node packages/open-vocaloid/dist/cli/main.js info
 ```
@@ -37,7 +38,8 @@ renderSong(spec, './out/song.wav');
 
 ## 架构
 
-- 领域核心在共享上游 `media.rs` 的 `media.voice`（音节合同、共振峰引擎、确定性渲染）与 `media.render`（`voice-export`：渲染 + PCM16 量化 + `media.codec` 写 WAV）。
+- 领域核心在共享 `media.*` 上游的 `media.voice`（音节合同、共振峰引擎、确定性渲染）与 `media.render`（`voice-export`：渲染 + PCM16 量化 + `media.codec` 写 WAV）。
+- CLI 的 `--seed` / `--tempo` / `--volume` 只是对 spec 的显式覆盖，范围校验仍在 Rust（越界返回 `invalid_input`）。
 - 本仓只保留薄绑定（Node-API）、TS 作者面、CLI（`@wae/commander` 命令树）与平台包。
 - 合同：范围校验在 Rust（`invalid_input`，禁止绑定层钳制）；同 spec+seed 字节级复现；元音/辅音名 kebab-case 唯一拼写。
 - 许可证：Apache-2.0。
