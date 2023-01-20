@@ -35,6 +35,8 @@ node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/son
 node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav --seed 2 --tempo 100 --volume 0.5
 node packages/open-vocaloid/dist/cli/main.js validate ./song.json
 node packages/open-vocaloid/dist/cli/main.js info
+node packages/open-vocaloid/dist/cli/main.js validate ./song.json --json
+node packages/open-vocaloid/dist/cli/main.js info --json
 ```
 
 As a library (small orthogonal functions):

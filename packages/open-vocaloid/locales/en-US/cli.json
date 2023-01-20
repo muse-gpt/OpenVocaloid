@@ -7,5 +7,6 @@
   "cli.opt.output": "Output WAV path",
   "cli.opt.seed": "Override the spec seed",
   "cli.opt.volume": "Override the spec output volume (0..1)",
-  "cli.opt.tempo": "Override the spec tempo in BPM"
+  "cli.opt.tempo": "Override the spec tempo in BPM",
+  "cli.opt.json": "Print machine-readable JSON"
 }

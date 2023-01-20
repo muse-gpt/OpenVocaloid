@@ -5,6 +5,7 @@ import { readSpecFile } from '../spec-file.js';
 
 export function registerValidateCommand(cli: Cli): void {
     cli.command('validate', 'cli.cmd.validate')
+        .option('--json', 'cli.opt.json')
         .action((options) => {
             const specPath = options._[0];
             if (!specPath) {
@@ -14,6 +15,10 @@ export function registerValidateCommand(cli: Cli): void {
             const spec = readSpecFile(specPath);
             validateSong(spec);
             const info = songInfo(spec);
+            if (options.json === true) {
+                console.log(JSON.stringify({ ok: true, spec: specPath, ...info }, null, 2));
+                return 0;
+            }
             console.log(`ok: ${specPath} (${info.syllables} syllables, ${info.durationSeconds.toFixed(2)}s)`);
             return 0;
         });

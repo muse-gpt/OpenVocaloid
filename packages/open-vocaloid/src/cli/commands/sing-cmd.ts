@@ -12,6 +12,7 @@ export function registerSingCommand(cli: Cli): void {
         .option('--seed <n>', 'cli.opt.seed')
         .option('--volume <0..1>', 'cli.opt.volume')
         .option('--tempo <bpm>', 'cli.opt.tempo')
+        .option('--json', 'cli.opt.json')
         .action((options) => {
             const specPath = options._[0];
             const out = options.output as string | undefined;
@@ -21,6 +22,10 @@ export function registerSingCommand(cli: Cli): void {
             }
             const spec = applyOverrides(readSpecFile(specPath), options);
             const result = renderSong(spec, out);
+            if (options.json === true) {
+                console.log(JSON.stringify(result, null, 2));
+                return 0;
+            }
             console.log(`${result.out} ${result.bytes} bytes (${result.syllables} syllables, ${result.durationSeconds.toFixed(2)}s)`);
             return 0;
         });
