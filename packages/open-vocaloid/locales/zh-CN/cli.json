@@ -4,6 +4,7 @@
   "cli.cmd.demo": "渲染内置示例旋律为 WAV",
   "cli.cmd.validate": "校验 spec 文件（不渲染；位置参数：<spec.json>）",
   "cli.cmd.info": "打印原生版本与元音/辅音合同表",
+  "cli.cmd.version": "打印原生引擎版本",
   "cli.opt.output": "输出 WAV 路径",
   "cli.opt.seed": "覆盖 spec 中的随机种子",
   "cli.opt.volume": "覆盖 spec 中的输出音量（0..1）",

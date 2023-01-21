@@ -4,6 +4,7 @@
   "cli.cmd.demo": "Render the built-in demo melody into a WAV",
   "cli.cmd.validate": "Validate a spec file without rendering (positional: <spec.json>)",
   "cli.cmd.info": "Print native version and the vowel/onset contract tables",
+  "cli.cmd.version": "Print the native engine version",
   "cli.opt.output": "Output WAV path",
   "cli.opt.seed": "Override the spec seed",
   "cli.opt.volume": "Override the spec output volume (0..1)",

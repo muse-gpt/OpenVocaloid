@@ -7,6 +7,7 @@ import { registerDemoCommand } from './commands/demo-cmd.js';
 import { registerInfoCommand } from './commands/info-cmd.js';
 import { registerSingCommand } from './commands/sing-cmd.js';
 import { registerValidateCommand } from './commands/validate-cmd.js';
+import { registerVersionCommand } from './commands/version-cmd.js';
 
 export function localesRoot(): string {
     return join(dirname(fileURLToPath(import.meta.url)), '../../locales');
@@ -22,6 +23,7 @@ export function buildVocaloidCli() {
     registerDemoCommand(cli);
     registerValidateCommand(cli);
     registerInfoCommand(cli);
+    registerVersionCommand(cli);
 
     return cli;
 }
