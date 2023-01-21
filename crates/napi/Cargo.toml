@@ -12,6 +12,7 @@ description = "Node-API surface for OpenVocaloid"
 crate-type = ["cdylib"]
 
 [dependencies]
+media-harness = { workspace = true }
 media-voice = { workspace = true }
 media-render = { workspace = true }
 media-types = { workspace = true }

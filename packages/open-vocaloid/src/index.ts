@@ -65,9 +65,23 @@ export interface SongInfo {
     syllables: number;
 }
 
+/** Peak, RMS and clipping facts for one rendered song. */
+export interface LevelStats {
+    /** Peak level in dBFS. */
+    peakDbfs: number;
+    /** RMS level in dBFS. */
+    rmsDbfs: number;
+    /** Samples at or beyond full scale. */
+    clipped: number;
+    /** Measured samples, both channels interleaved. */
+    samples: number;
+}
+
 export interface RenderedSong extends SongInfo {
     out: string;
     bytes: number;
+    /** Measured level of the exact frames written to `out`. */
+    level: LevelStats;
 }
 
 /** The contracted vowels with formant tables, in canonical order. */
@@ -113,6 +127,12 @@ export function renderSong(spec: VoiceSpec, out: string): RenderedSong {
         bytes: result.bytes,
         durationSeconds: result.duration_seconds,
         syllables: result.syllables,
+        level: {
+            peakDbfs: result.level.peak_dbfs,
+            rmsDbfs: result.level.rms_dbfs,
+            clipped: result.level.clipped,
+            samples: result.level.samples,
+        },
     };
 }
 

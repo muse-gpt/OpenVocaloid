@@ -27,6 +27,10 @@ export function registerSingCommand(cli: Cli): void {
                 return 0;
             }
             console.log(`${result.out} ${result.bytes} bytes (${result.syllables} syllables, ${result.durationSeconds.toFixed(2)}s)`);
+            console.log(
+                `level: peak ${result.level.peakDbfs.toFixed(1)} dBFS, rms ${result.level.rmsDbfs.toFixed(1)} dBFS` +
+                    (result.level.clipped > 0 ? `, clipped ${result.level.clipped}` : ''),
+            );
             return 0;
         });
 }

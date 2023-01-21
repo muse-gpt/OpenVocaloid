@@ -97,7 +97,12 @@ fn render_song(ctx: CallContext) -> Result<JsValue> {
         }
     }
 
-    media_render::write_voice(&spec, &out, SAMPLE_RATE).map_err(map_domain_error)?;
+    // One synthesis pass feeds both the file and the meter: the host gets
+    // level facts without rendering the song twice.
+    let frames = media_render::voice_samples(&spec, SAMPLE_RATE).map_err(map_domain_error)?;
+    media_render::write_voice_frames(&frames, &out, SAMPLE_RATE).map_err(map_domain_error)?;
+    let interleaved: Vec<f32> = frames.iter().flat_map(|frame| frame.iter().copied()).collect();
+    let level = media_harness::measure_f32(&interleaved);
 
     let bytes = std::fs::metadata(&out).map(|m| m.len()).unwrap_or(0);
     let value = serde_json::json!({
@@ -105,6 +110,12 @@ fn render_song(ctx: CallContext) -> Result<JsValue> {
         "bytes": bytes,
         "duration_seconds": spec.duration_seconds(),
         "syllables": spec.syllables.len(),
+        "level": {
+            "peak_dbfs": level.peak_db,
+            "rms_dbfs": level.rms_db,
+            "clipped": level.clipped,
+            "samples": level.samples,
+        },
     });
     json_to_js(ctx.env(), &value)
 }

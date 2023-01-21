@@ -21,9 +21,17 @@ export interface NativeSongInfo {
     syllables: number;
 }
 
+export interface NativeLevel {
+    peak_dbfs: number;
+    rms_dbfs: number;
+    clipped: number;
+    samples: number;
+}
+
 export interface NativeRenderResult extends NativeSongInfo {
     out: string;
     bytes: number;
+    level: NativeLevel;
 }
 
 export interface NativeBinding {
