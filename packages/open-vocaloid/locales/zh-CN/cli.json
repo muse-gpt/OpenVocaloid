@@ -9,5 +9,7 @@
   "cli.opt.seed": "覆盖 spec 中的随机种子",
   "cli.opt.volume": "覆盖 spec 中的输出音量（0..1）",
   "cli.opt.tempo": "覆盖 spec 中的 BPM",
+  "cli.opt.breath": "覆盖 spec 中的气息量（0..1）",
+  "cli.opt.vibrato": "覆盖颤音，形如 <速率>,<深度>,<延迟>，例如 5.5,0.12,0.25",
   "cli.opt.json": "以 JSON 输出结果"
 }

@@ -33,6 +33,7 @@ pnpm build
 node packages/open-vocaloid/dist/cli/main.js demo --output ./out/demo.wav
 node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav
 node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav --seed 2 --tempo 100 --volume 0.5
+node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav --breath 0.2 --vibrato 5.5,0.12,0.25
 node packages/open-vocaloid/dist/cli/main.js validate ./song.json
 node packages/open-vocaloid/dist/cli/main.js info
 node packages/open-vocaloid/dist/cli/main.js validate ./song.json --json
@@ -58,7 +59,7 @@ renderSong(spec, './out/song.wav');
   (syllable contract, formant engine, deterministic rendering) and
   `media.render` (`voice-export`: render + PCM16 quantization + WAV through
   `media.codec`).
-- `--seed` / `--tempo` / `--volume` are explicit overrides on top of the spec;
+- `--seed` / `--tempo` / `--volume` / `--breath` / `--vibrato` are explicit overrides on top of the spec;
   range validation stays in Rust (out-of-range returns `invalid_input`).
 - This repository keeps only the thin binding (Node-API), the TypeScript
   authoring surface, the CLI (`@wae/commander` command tree) and the platform
