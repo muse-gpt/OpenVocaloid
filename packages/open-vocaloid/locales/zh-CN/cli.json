@@ -3,6 +3,7 @@
   "cli.cmd.sing": "将 spec 文件合成为 WAV 歌声（位置参数：<spec.json>）",
   "cli.cmd.demo": "渲染内置示例旋律为 WAV",
   "cli.cmd.validate": "校验 spec 文件（不渲染；位置参数：<spec.json>）",
+  "cli.cmd.verify": "渲染到临时 WAV 并检查时长、电平与削波（位置参数：<spec.json>）",
   "cli.cmd.info": "打印原生版本与元音/辅音合同表",
   "cli.cmd.version": "打印原生引擎版本",
   "cli.opt.output": "输出 WAV 路径",

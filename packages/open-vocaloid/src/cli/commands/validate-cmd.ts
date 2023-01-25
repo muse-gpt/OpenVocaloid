@@ -12,14 +12,21 @@ export function registerValidateCommand(cli: Cli): void {
                 console.error('usage: open-vocaloid validate <spec.json>');
                 return 2;
             }
-            const spec = readSpecFile(specPath);
-            validateSong(spec);
-            const info = songInfo(spec);
-            if (options.json === true) {
-                console.log(JSON.stringify({ ok: true, spec: specPath, ...info }, null, 2));
+            try {
+                const spec = readSpecFile(specPath);
+                validateSong(spec);
+                const info = songInfo(spec);
+                if (options.json === true) {
+                    console.log(JSON.stringify({ ok: true, spec: specPath, ...info }, null, 2));
+                    return 0;
+                }
+                console.log(`ok: ${specPath} (${info.syllables} syllables, ${info.durationSeconds.toFixed(2)}s)`);
                 return 0;
             }
-            console.log(`ok: ${specPath} (${info.syllables} syllables, ${info.durationSeconds.toFixed(2)}s)`);
-            return 0;
+            catch (error) {
+                // A rejected spec is a normal result: report it without a stack.
+                console.error(`open-vocaloid: ${error instanceof Error ? error.message : String(error)}`);
+                return 1;
+            }
         });
 }
