@@ -1,0 +1,11 @@
+{
+    "tempoBpm": 120,
+    "breath": 0.1,
+    "volume": 0.8,
+    "seed": 1,
+    "syllables": [
+        { "onset": "r", "vowel": "a", "pitch": 392.0, "beats": 1.0 },
+        { "vowel": "o", "pitch": 440.0, "beats": 1.0 },
+        { "onset": "n", "vowel": "u", "pitch": 523.25, "beats": 2.0 }
+    ]
+}
