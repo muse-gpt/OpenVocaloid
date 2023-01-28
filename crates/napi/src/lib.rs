@@ -104,12 +104,16 @@ fn render_song(ctx: CallContext) -> Result<JsValue> {
     let interleaved: Vec<f32> = frames.iter().flat_map(|frame| frame.iter().copied()).collect();
     let level = media_harness::measure_f32(&interleaved);
 
-    let bytes = std::fs::metadata(&out).map(|m| m.len()).unwrap_or(0);
+    // The fingerprint covers the bytes on disk, so two hosts can prove they
+    // produced the same asset without comparing waveforms.
+    let written = std::fs::read(&out).map_err(|e| Error::new(format!("cannot read back {out}: {e}")))?;
+    let bytes = written.len() as u64;
     let value = serde_json::json!({
         "out": out,
         "bytes": bytes,
         "duration_seconds": spec.duration_seconds(),
         "syllables": spec.syllables.len(),
+        "fingerprint": fnv1a(&written),
         "level": {
             "peak_dbfs": level.peak_db,
             "rms_dbfs": level.rms_db,
@@ -118,6 +122,16 @@ fn render_song(ctx: CallContext) -> Result<JsValue> {
         },
     });
     json_to_js(ctx.env(), &value)
+}
+
+/// FNV-1a 64 of the written file, in the same `016x` form as the other hashes.
+fn fnv1a(bytes: &[u8]) -> String {
+    let mut state = 0xcbf2_9ce4_8422_2325u64;
+    for byte in bytes {
+        state ^= u64::from(*byte);
+        state = state.wrapping_mul(0x0000_0100_0000_01b3);
+    }
+    format!("{state:016x}")
 }
 
 /// Reads the `{ spec: string }` option object and deserializes it with the

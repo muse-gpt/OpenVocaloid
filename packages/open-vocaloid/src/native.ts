@@ -31,6 +31,8 @@ export interface NativeLevel {
 export interface NativeRenderResult extends NativeSongInfo {
     out: string;
     bytes: number;
+    /** FNV-1a of the written WAV bytes. */
+    fingerprint: string;
     level: NativeLevel;
 }
 

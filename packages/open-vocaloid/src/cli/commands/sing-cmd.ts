@@ -34,6 +34,7 @@ export function registerSingCommand(cli: Cli): void {
                     `level: peak ${result.level.peakDbfs.toFixed(1)} dBFS, rms ${result.level.rmsDbfs.toFixed(1)} dBFS` +
                         (result.level.clipped > 0 ? `, clipped ${result.level.clipped}` : ''),
                 );
+                console.log(`fingerprint: ${result.fingerprint}`);
                 return 0;
             }
             catch (error) {

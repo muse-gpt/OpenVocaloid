@@ -31,11 +31,13 @@ export function registerVerifyCommand(cli: Cli): void {
                 return 2;
             }
             const out = join(tmpdir(), `open-vocaloid-verify-${process.pid}.wav`);
+            const repeat = join(tmpdir(), `open-vocaloid-verify-${process.pid}-repeat.wav`);
             try {
                 const spec = readSpecFile(specPath);
                 validateSong(spec);
                 const expected = songInfo(spec);
                 const result = renderSong(spec, out);
+                const again = renderSong(spec, repeat);
                 const checks: Check[] = [
                     { name: 'output', ok: result.bytes > 0, detail: `${result.bytes} bytes` },
                     {
@@ -54,6 +56,11 @@ export function registerVerifyCommand(cli: Cli): void {
                         detail: `peak ${result.level.peakDbfs.toFixed(1)} dBFS, rms ${result.level.rmsDbfs.toFixed(1)} dBFS`,
                     },
                     { name: 'clipping', ok: result.level.clipped === 0, detail: `${result.level.clipped} clipped samples` },
+                    {
+                        name: 'reproducible',
+                        ok: result.fingerprint === again.fingerprint,
+                        detail: result.fingerprint,
+                    },
                 ];
                 const ok = checks.every((check) => check.ok);
                 if (options.json === true) {
@@ -72,6 +79,7 @@ export function registerVerifyCommand(cli: Cli): void {
             }
             finally {
                 rmSync(out, { force: true });
+                rmSync(repeat, { force: true });
             }
         });
 }

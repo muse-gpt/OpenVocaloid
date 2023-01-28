@@ -80,6 +80,8 @@ export interface LevelStats {
 export interface RenderedSong extends SongInfo {
     out: string;
     bytes: number;
+    /** FNV-1a of the written WAV bytes; equal specs and seeds produce equal ids. */
+    fingerprint: string;
     /** Measured level of the exact frames written to `out`. */
     level: LevelStats;
 }
@@ -127,6 +129,7 @@ export function renderSong(spec: VoiceSpec, out: string): RenderedSong {
         bytes: result.bytes,
         durationSeconds: result.duration_seconds,
         syllables: result.syllables,
+        fingerprint: result.fingerprint,
         level: {
             peakDbfs: result.level.peak_dbfs,
             rmsDbfs: result.level.rms_dbfs,
