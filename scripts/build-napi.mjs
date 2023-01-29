@@ -26,6 +26,12 @@ export const TARGETS = {
         triple: 'x86_64-unknown-linux-gnu',
         cdylib: 'libopenvocaloid_napi.so',
     },
+    'aarch64-unknown-linux-gnu': {
+        platform: 'linux',
+        arch: 'arm64',
+        triple: 'aarch64-unknown-linux-gnu',
+        cdylib: 'libopenvocaloid_napi.so',
+    },
     'x86_64-apple-darwin': {
         platform: 'darwin',
         arch: 'x64',
@@ -44,6 +50,7 @@ export const TARGETS = {
 const HOST_TO_TRIPLE = {
     'win32-x64': 'x86_64-pc-windows-msvc',
     'linux-x64': 'x86_64-unknown-linux-gnu',
+    'linux-arm64': 'aarch64-unknown-linux-gnu',
     'darwin-x64': 'x86_64-apple-darwin',
     'darwin-arm64': 'aarch64-apple-darwin',
 };

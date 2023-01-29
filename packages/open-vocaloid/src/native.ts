@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
 
-export type PlatformKey = 'win32-x64' | 'linux-x64' | 'darwin-x64' | 'darwin-arm64';
+export type PlatformKey = 'win32-x64' | 'linux-x64' | 'linux-arm64' | 'darwin-x64' | 'darwin-arm64';
 
 export interface NativeVowelRow {
     vowel: string;
@@ -51,6 +51,7 @@ export interface NativeBinding {
 export function platformKey(platform = process.platform, arch = process.arch): PlatformKey | null {
     if (platform === 'win32' && arch === 'x64') return 'win32-x64';
     if (platform === 'linux' && arch === 'x64') return 'linux-x64';
+    if (platform === 'linux' && arch === 'arm64') return 'linux-arm64';
     if (platform === 'darwin' && arch === 'x64') return 'darwin-x64';
     if (platform === 'darwin' && arch === 'arm64') return 'darwin-arm64';
     return null;
@@ -70,7 +71,7 @@ function load(): NativeBinding {
     if (!key) {
         throw new Error(
             `OpenVocaloid native binding is not available for ${os.platform()}-${os.arch()}.\n` +
-                `Supported hosts: win32-x64, linux-x64, darwin-x64, darwin-arm64.\n` +
+                `Supported hosts: win32-x64, linux-x64, linux-arm64, darwin-x64, darwin-arm64.\n` +
                 `Set OPEN_VOCALOID_NATIVE to a built .node file when staging outside the optional-dep layout.`,
         );
     }
