@@ -6,8 +6,9 @@
     "scripts": {
         "build": "pnpm run build:napi && pnpm run build:ts",
         "build:ts": "pnpm --filter @wae/open-vocaloid run build",
-        "build:napi": "cargo build -p openvocaloid-napi --release && node scripts/stage-native.mjs",
+        "build:napi": "node scripts/build-napi.mjs",
         "typecheck": "pnpm --filter @wae/open-vocaloid run typecheck",
+        "verify": "node scripts/verify-install.mjs",
         "demo": "node packages/open-vocaloid/dist/cli/main.js demo --output ./out/demo.wav",
         "info": "node packages/open-vocaloid/dist/cli/main.js info"
     }

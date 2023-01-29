@@ -41,6 +41,10 @@
         "directory": "packages/open-vocaloid"
     },
     "optionalDependencies": {
+        "@wae/open-vocaloid-darwin-arm64": "workspace:*",
+        "@wae/open-vocaloid-darwin-x64": "workspace:*",
+        "@wae/open-vocaloid-linux-arm64": "workspace:*",
+        "@wae/open-vocaloid-linux-x64": "workspace:*",
         "@wae/open-vocaloid-win32-x64": "workspace:*"
     },
     "dependencies": {

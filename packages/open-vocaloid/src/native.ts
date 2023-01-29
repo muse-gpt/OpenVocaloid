@@ -11,6 +11,8 @@ import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
 
+export type PlatformKey = 'win32-x64' | 'linux-x64' | 'darwin-x64' | 'darwin-arm64';
+
 export interface NativeVowelRow {
     vowel: string;
     formants: number[];
@@ -45,19 +47,35 @@ export interface NativeBinding {
     renderSong(options: { spec: string; out: string }): NativeRenderResult;
 }
 
-const PLATFORM_PACKAGE = '@wae/open-vocaloid-win32-x64';
+/** Map Node platform and arch to the optionalDependency package suffix. */
+export function platformKey(platform = process.platform, arch = process.arch): PlatformKey | null {
+    if (platform === 'win32' && arch === 'x64') return 'win32-x64';
+    if (platform === 'linux' && arch === 'x64') return 'linux-x64';
+    if (platform === 'darwin' && arch === 'x64') return 'darwin-x64';
+    if (platform === 'darwin' && arch === 'arm64') return 'darwin-arm64';
+    return null;
+}
 
-function candidates(): string[] {
+function candidates(key: PlatformKey): string[] {
     const override = process.env.OPEN_VOCALOID_NATIVE;
+    const scoped = `@wae/open-vocaloid-${key}`;
     const here = path.dirname(fileURLToPath(import.meta.url));
-    const local = path.resolve(here, '..', '..', 'open-vocaloid-win32-x64');
-    const packages = [PLATFORM_PACKAGE, local];
+    const local = path.resolve(here, '..', '..', `open-vocaloid-${key}`);
+    const packages = [scoped, local];
     return override ? [override, ...packages] : packages;
 }
 
 function load(): NativeBinding {
+    const key = platformKey();
+    if (!key) {
+        throw new Error(
+            `OpenVocaloid native binding is not available for ${os.platform()}-${os.arch()}.\n` +
+                `Supported hosts: win32-x64, linux-x64, darwin-x64, darwin-arm64.\n` +
+                `Set OPEN_VOCALOID_NATIVE to a built .node file when staging outside the optional-dep layout.`,
+        );
+    }
     const errors: string[] = [];
-    for (const candidate of candidates()) {
+    for (const candidate of candidates(key)) {
         try {
             return require(candidate) as NativeBinding;
         }
@@ -66,8 +84,8 @@ function load(): NativeBinding {
         }
     }
     throw new Error(
-        `OpenVocaloid native binding is not available for ${os.platform()}-${os.arch()}.\n` +
-            `Set OPEN_VOCALOID_NATIVE to a built .node file, or install ${PLATFORM_PACKAGE}.\n` +
+        `OpenVocaloid native binding is not available for ${key}.\n` +
+            `Set OPEN_VOCALOID_NATIVE to a built .node file, or install @wae/open-vocaloid-${key}.\n` +
             `Tried:\n${errors.map((line) => `  - ${line}`).join('\n')}`,
     );
 }

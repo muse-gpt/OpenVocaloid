@@ -7,6 +7,15 @@
     "cpu": ["x64"],
     "main": "./open-vocaloid.win32-x64.node",
     "files": [
-        "open-vocaloid.win32-x64.node"
-    ]
+        "open-vocaloid.win32-x64.node",
+        "README.md"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/muse-gpt/vocaloid.git",
+        "directory": "packages/open-vocaloid-win32-x64"
+    }
 }

@@ -26,4 +26,5 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: pnpm install
       - run: pnpm run build
+      - run: pnpm run verify
       - run: node packages/open-vocaloid/dist/cli/main.js verify examples/demo.json --json

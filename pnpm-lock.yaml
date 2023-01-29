@@ -9,20 +9,41 @@ importers:
   .: {}
 
   packages/open-vocaloid:
+    dependencies:
+      '@wae/commander':
+        specifier: ^0.0.6
+        version: 0.0.6
     devDependencies:
       '@types/node':
         specifier: ^22.20.4
         version: 22.20.5
-      '@wae/commander':
-        specifier: ^0.0.6
-        version: 0.0.6
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
     optionalDependencies:
+      '@wae/open-vocaloid-darwin-arm64':
+        specifier: workspace:*
+        version: link:../open-vocaloid-darwin-arm64
+      '@wae/open-vocaloid-darwin-x64':
+        specifier: workspace:*
+        version: link:../open-vocaloid-darwin-x64
+      '@wae/open-vocaloid-linux-arm64':
+        specifier: workspace:*
+        version: link:../open-vocaloid-linux-arm64
+      '@wae/open-vocaloid-linux-x64':
+        specifier: workspace:*
+        version: link:../open-vocaloid-linux-x64
       '@wae/open-vocaloid-win32-x64':
         specifier: workspace:*
         version: link:../open-vocaloid-win32-x64
+
+  packages/open-vocaloid-darwin-arm64: {}
+
+  packages/open-vocaloid-darwin-x64: {}
+
+  packages/open-vocaloid-linux-arm64: {}
+
+  packages/open-vocaloid-linux-x64: {}
 
   packages/open-vocaloid-win32-x64: {}
 
