@@ -12,5 +12,6 @@
   "cli.opt.tempo": "Override the spec tempo in BPM",
   "cli.opt.breath": "Override the spec breath level (0..1)",
   "cli.opt.vibrato": "Override vibrato as <rate>,<depth>,<delay>, e.g. 5.5,0.12,0.25",
+  "cli.opt.transpose": "Transpose every syllable by a number of semitones",
   "cli.opt.json": "Print machine-readable JSON"
 }

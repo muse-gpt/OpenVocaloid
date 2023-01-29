@@ -14,6 +14,7 @@ export function registerSingCommand(cli: Cli): void {
         .option('--tempo <bpm>', 'cli.opt.tempo')
         .option('--breath <0..1>', 'cli.opt.breath')
         .option('--vibrato <rate,depth,delay>', 'cli.opt.vibrato')
+        .option('--transpose <semitones>', 'cli.opt.transpose')
         .option('--json', 'cli.opt.json')
         .action((options) => {
             const specPath = options._[0];
@@ -67,6 +68,16 @@ function applyOverrides(spec: VoiceSpec, options: Record<string, unknown>): Voic
             throw new Error('--vibrato must be <rate>,<depth>,<delay>, e.g. 5.5,0.12,0.25');
         }
         next.vibrato = { rateHz: parts[0], depth: parts[1], delayS: parts[2] };
+    }
+    if (options.transpose !== undefined) {
+        const semitones = Number(options.transpose);
+        if (!Number.isFinite(semitones)) {
+            throw new Error(`--transpose must be a number of semitones, got ${String(options.transpose)}`);
+        }
+        // Nothing is clamped here: the domain rejects pitches outside 40..1200
+        // Hz, so an impossible transposition fails instead of silently bending.
+        const factor = 2 ** (semitones / 12);
+        next.syllables = next.syllables.map((syllable) => ({ ...syllable, pitch: syllable.pitch * factor }));
     }
     return next;
 }
