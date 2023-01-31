@@ -18,8 +18,7 @@
     "files": [
         "dist",
         "locales",
-        "Readme.md",
-        "License.md"
+        "README.md"
     ],
     "scripts": {
         "build": "tsc -p tsconfig.json",
