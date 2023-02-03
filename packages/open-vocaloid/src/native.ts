@@ -45,6 +45,8 @@ export interface NativeBinding {
     validateSpec(options: { spec: string }): true;
     songInfo(options: { spec: string }): NativeSongInfo;
     renderSong(options: { spec: string; out: string }): NativeRenderResult;
+    checkVoiceRequest(options: { backend: string; request: string }): true;
+    voiceRequestFingerprint(options: { backend: string; request: string }): string;
 }
 
 /** Map Node platform and arch to the optionalDependency package suffix. */

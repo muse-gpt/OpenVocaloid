@@ -143,3 +143,71 @@ export function renderSong(spec: VoiceSpec, out: string): RenderedSong {
 export function nativeVersion(): string {
     return native.version();
 }
+
+/** A capability a voice backend may declare. */
+export type VoiceFeature = 'tts' | 'svs' | 'svc' | 'align';
+
+/** Where a backend runs. */
+export type VoiceExecution =
+    | { kind: 'local' }
+    | { kind: 'remote'; service: string; unofficial?: boolean }
+    | { kind: 'bridged'; runtime: string };
+
+/** How a backend is paid for. */
+export type VoiceCostModel = { kind: 'free' } | { kind: 'metered'; unit: string } | { kind: 'unknown' };
+
+/** Best timing granularity a backend reports. */
+export type VoiceTiming = 'none' | 'sentence' | 'word' | 'phoneme';
+
+/**
+ * What one backend declares about itself.
+ *
+ * A backend states its features, its languages and voices, the options it
+ * honours and where it runs. Nothing is assumed: an undeclared option is
+ * refused rather than approximated.
+ */
+export interface VoiceBackend {
+    id: string;
+    version: string;
+    features: VoiceFeature[];
+    languages?: string[];
+    voices?: string[];
+    /** Whether speaking rate can be set. */
+    rate?: boolean;
+    streaming?: boolean;
+    timing?: VoiceTiming;
+    execution: VoiceExecution;
+    billing: VoiceCostModel;
+}
+
+/** One request against a declared backend. */
+export interface VoiceRequest {
+    feature: VoiceFeature;
+    text?: string;
+    voice?: string;
+    language?: string;
+    /** Speaking rate multiplier, `1` being the backend's own normal speed. */
+    speed?: number;
+    streaming?: boolean;
+    timing?: boolean;
+}
+
+/**
+ * Checks a request against a backend declaration without running anything.
+ *
+ * An undeclared feature, language, voice, rate, streaming or timing request
+ * throws with the backend's name; nothing falls back to another backend.
+ */
+export function checkVoiceRequest(backend: VoiceBackend, request: VoiceRequest): true {
+    return native.checkVoiceRequest({ backend: JSON.stringify(backend), request: JSON.stringify(request) });
+}
+
+/**
+ * Fingerprint of everything that changes the produced audio.
+ *
+ * Backend id and version are included, so upgrading the engine invalidates
+ * cached audio even when the request text is unchanged.
+ */
+export function voiceRequestFingerprint(backend: VoiceBackend, request: VoiceRequest): string {
+    return native.voiceRequestFingerprint({ backend: JSON.stringify(backend), request: JSON.stringify(request) });
+}

@@ -124,6 +124,58 @@ fn render_song(ctx: CallContext) -> Result<JsValue> {
     json_to_js(ctx.env(), &value)
 }
 
+/// Checks a backend declaration against a request without running anything.
+///
+/// Argument: `{ backend: string, request: string }`, both JSON in the JS
+/// authoring shape. An undeclared feature, language, voice, rate, streaming or
+/// timing request is rejected with the backend's name and an `unsupported_platform:`
+/// prefix. Nothing is substituted: a caller that wants another backend has to
+/// ask for it explicitly.
+#[function(js_name = "checkVoiceRequest")]
+fn check_voice_request(ctx: CallContext) -> Result<JsValue> {
+    let (backend, request) = read_backend_request(&ctx)?;
+    media_voice::check_request(&backend, &request).map_err(map_domain_error)?;
+    ctx.env().boolean(true)
+}
+
+/// Fingerprint of everything that changes the produced audio.
+///
+/// Argument: `{ backend: string, request: string }`. The backend id and version
+/// are part of the value, so upgrading the engine invalidates cached audio even
+/// when the request text is unchanged.
+#[function(js_name = "voiceRequestFingerprint")]
+fn voice_request_fingerprint(ctx: CallContext) -> Result<JsValue> {
+    let (backend, request) = read_backend_request(&ctx)?;
+    let fingerprint = media_voice::request_fingerprint(&backend, &request);
+    ctx.env().string(&fingerprint)
+}
+
+/// Reads the `{ backend, request }` pair with the upstream serde shapes.
+fn read_backend_request(ctx: &CallContext) -> Result<(media_voice::BackendCapability, media_voice::VoiceRequest)> {
+    let arg = ctx
+        .args()
+        .first()
+        .copied()
+        .ok_or_else(|| Error::new("a backend and request JSON are required"))?;
+    let backend = parse_backend(arg.get_named("backend")?.as_string()?)?;
+    let request = parse_request(arg.get_named("request")?.as_string()?)?;
+    Ok((backend, request))
+}
+
+fn parse_backend(json: String) -> Result<media_voice::BackendCapability> {
+    let value: serde_json::Value = serde_json::from_str(&json)
+        .map_err(|e| map_domain_error(media_types::Error::invalid_input(format!("backend: {e}"))))?;
+    serde_json::from_value(snake_keys(value))
+        .map_err(|e| map_domain_error(media_types::Error::invalid_input(format!("backend: {e}"))))
+}
+
+fn parse_request(json: String) -> Result<media_voice::VoiceRequest> {
+    let value: serde_json::Value = serde_json::from_str(&json)
+        .map_err(|e| map_domain_error(media_types::Error::invalid_input(format!("request: {e}"))))?;
+    serde_json::from_value(snake_keys(value))
+        .map_err(|e| map_domain_error(media_types::Error::invalid_input(format!("request: {e}"))))
+}
+
 /// FNV-1a 64 of the written file, in the same `016x` form as the other hashes.
 fn fnv1a(bytes: &[u8]) -> String {
     let mut state = 0xcbf2_9ce4_8422_2325u64;
@@ -212,4 +264,4 @@ fn json_to_js(env: Env, value: &serde_json::Value) -> Result<JsValue> {
     }
 }
 
-register_module![version, vowel_table, onset_table, validate_spec, song_info, render_song];
+register_module![version, vowel_table, onset_table, validate_spec, song_info, render_song, check_voice_request, voice_request_fingerprint];
