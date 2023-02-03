@@ -38,6 +38,17 @@ export interface NativeRenderResult extends NativeSongInfo {
     level: NativeLevel;
 }
 
+export interface NativeBridgeCommand {
+    program: string;
+    args: string[];
+}
+
+export interface NativeWordTiming {
+    startMs: number;
+    endMs: number;
+    text: string;
+}
+
 export interface NativeBinding {
     version(): string;
     vowelTable(): NativeVowelRow[];
@@ -47,6 +58,15 @@ export interface NativeBinding {
     renderSong(options: { spec: string; out: string }): NativeRenderResult;
     checkVoiceRequest(options: { backend: string; request: string }): true;
     voiceRequestFingerprint(options: { backend: string; request: string }): string;
+    edgeTtsCommand(options: {
+        python: string;
+        text: string;
+        voice: string;
+        ratePercent?: number;
+        mediaOut: string;
+        subtitleOut: string;
+    }): NativeBridgeCommand;
+    parseWordTimings(options: { srt: string }): { timings: NativeWordTiming[] };
 }
 
 /** Map Node platform and arch to the optionalDependency package suffix. */

@@ -150,6 +150,50 @@ fn voice_request_fingerprint(ctx: CallContext) -> Result<JsValue> {
     ctx.env().string(&fingerprint)
 }
 
+/// Builds the `edge-tts` invocation for one request.
+///
+/// Argument: `{ python, text, voice, ratePercent, mediaOut, subtitleOut }`.
+/// Returns `{ program, args }`. Nothing is started here: the host decides
+/// whether the declared runtime is allowed to run, and the engine is addressed
+/// by module, not by a pinned script.
+#[function(js_name = "edgeTtsCommand")]
+fn edge_tts_command(ctx: CallContext) -> Result<JsValue> {
+    let arg = ctx
+        .args()
+        .first()
+        .copied()
+        .ok_or_else(|| Error::new("edgeTtsCommand requires an options object"))?;
+    let python = arg.get_named("python")?.as_string()?;
+    let text = arg.get_named("text")?.as_string()?;
+    let voice = arg.get_named("voice")?.as_string()?;
+    let rate = arg.get_named("ratePercent")?.as_f64().unwrap_or(0.0) as i32;
+    let media_out = arg.get_named("mediaOut")?.as_string()?;
+    let subtitle_out = arg.get_named("subtitleOut")?.as_string()?;
+    let command = media_voice::edge_tts_command(&python, &text, &voice, rate, std::path::Path::new(&media_out), std::path::Path::new(&subtitle_out));
+    json_to_js(ctx.env(), &serde_json::json!({ "program": command.program, "args": command.args }))
+}
+
+/// Parses the word-boundary SRT an engine reports into timings.
+///
+/// Argument: `{ srt: string }`. Returns `{ timings: [{ startMs, endMs, text }] }`.
+/// A malformed or backwards cue is an error: a dropped word would look like a
+/// successful alignment.
+#[function(js_name = "parseWordTimings")]
+fn parse_word_timings(ctx: CallContext) -> Result<JsValue> {
+    let arg = ctx
+        .args()
+        .first()
+        .copied()
+        .ok_or_else(|| Error::new("parseWordTimings requires an options object"))?;
+    let srt = arg.get_named("srt")?.as_string()?;
+    let timings = media_voice::parse_word_srt(&srt).map_err(map_domain_error)?;
+    let values: Vec<serde_json::Value> = timings
+        .iter()
+        .map(|timing| serde_json::json!({ "startMs": timing.start_ms, "endMs": timing.end_ms, "text": timing.text }))
+        .collect();
+    json_to_js(ctx.env(), &serde_json::json!({ "timings": values }))
+}
+
 /// Reads the `{ backend, request }` pair with the upstream serde shapes.
 fn read_backend_request(ctx: &CallContext) -> Result<(media_voice::BackendCapability, media_voice::VoiceRequest)> {
     let arg = ctx
@@ -264,4 +308,15 @@ fn json_to_js(env: Env, value: &serde_json::Value) -> Result<JsValue> {
     }
 }
 
-register_module![version, vowel_table, onset_table, validate_spec, song_info, render_song, check_voice_request, voice_request_fingerprint];
+register_module![
+    version,
+    vowel_table,
+    onset_table,
+    validate_spec,
+    song_info,
+    render_song,
+    check_voice_request,
+    voice_request_fingerprint,
+    edge_tts_command,
+    parse_word_timings
+];

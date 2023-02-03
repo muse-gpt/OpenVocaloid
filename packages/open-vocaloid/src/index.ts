@@ -211,3 +211,44 @@ export function checkVoiceRequest(backend: VoiceBackend, request: VoiceRequest):
 export function voiceRequestFingerprint(backend: VoiceBackend, request: VoiceRequest): string {
     return native.voiceRequestFingerprint({ backend: JSON.stringify(backend), request: JSON.stringify(request) });
 }
+
+/** One program invocation prepared for a bridged engine. */
+export interface BridgeCommand {
+    program: string;
+    args: string[];
+}
+
+/** One word or phrase boundary measured by the engine. */
+export interface WordTiming {
+    startMs: number;
+    endMs: number;
+    text: string;
+}
+
+/**
+ * Builds the `edge-tts` invocation for one request.
+ *
+ * The engine is addressed as a module on the declared interpreter, and both the
+ * media and the word-boundary file are written by the engine. Nothing is
+ * started here: the host decides whether the declared runtime may run.
+ */
+export function edgeTtsCommand(options: {
+    python: string;
+    text: string;
+    voice: string;
+    ratePercent?: number;
+    mediaOut: string;
+    subtitleOut: string;
+}): BridgeCommand {
+    return native.edgeTtsCommand(options);
+}
+
+/**
+ * Parses the word-boundary SRT the engine writes.
+ *
+ * A malformed or backwards cue throws: dropping a word would look like a
+ * successful alignment.
+ */
+export function parseWordTimings(srt: string): WordTiming[] {
+    return native.parseWordTimings({ srt }).timings;
+}
