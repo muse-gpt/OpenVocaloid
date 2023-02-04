@@ -171,6 +171,57 @@ fn parse_word_timings(ctx: CallContext) -> Result<JsValue> {
     json_to_js(ctx.env(), &serde_json::json!({ "timings": values }))
 }
 
+/// The backend declaration the native readaloud client implements.
+///
+/// Returns the capability JSON directly: it is the declaration to pass to
+/// `checkVoiceRequest` and `voiceRequestFingerprint`, so the author surface
+/// never hand-writes the remote service's identity.
+#[function(js_name = "readaloudCapability")]
+fn readaloud_capability(ctx: CallContext) -> Result<JsValue> {
+    let value = serde_json::to_value(media_voice::readaloud::capability()).map_err(|e| Error::new(format!("capability: {e}")))?;
+    json_to_js(ctx.env(), &value)
+}
+
+/// Synthesizes speech through the Edge readaloud service, in native Rust.
+///
+/// Argument: `{ text, voice, ratePercent?, wordBoundaries?, out }`. The
+/// request goes out over the workspace WebSocket stack and the returned MP3
+/// is written to `out`; word or sentence boundaries come back in absolute
+/// stream time. A refused token is retried once with the server's clock.
+/// No Python and no external binary are involved.
+#[function(js_name = "synthesizeRemote")]
+fn synthesize_remote(ctx: CallContext) -> Result<JsValue> {
+    let arg = ctx
+        .args()
+        .first()
+        .copied()
+        .ok_or_else(|| Error::new("synthesizeRemote requires an options object"))?;
+    let text = arg.get_named("text")?.as_string()?;
+    let voice = arg.get_named("voice")?.as_string()?;
+    let rate = arg.get_named("ratePercent")?.as_f64().unwrap_or(0.0) as i32;
+    let word_boundaries = arg.get_named("wordBoundaries")?.as_bool().unwrap_or(true);
+    let out = arg.get_named("out")?.as_string()?;
+
+    let request = media_voice::readaloud::SynthesisRequest { text, voice, rate_percent: rate, word_boundaries };
+    let synthesis = media_voice::readaloud::synthesize(&request).map_err(map_domain_error)?;
+
+    if let Some(parent) = std::path::Path::new(&out).parent() {
+        if !parent.as_os_str().is_empty() {
+            std::fs::create_dir_all(parent).map_err(|e| Error::new(format!("cannot create output directory: {e}")))?;
+        }
+    }
+    std::fs::write(&out, &synthesis.mp3).map_err(|e| Error::new(format!("cannot write {out}: {e}")))?;
+    let timings: Vec<serde_json::Value> = synthesis
+        .timings
+        .iter()
+        .map(|timing| serde_json::json!({ "startMs": timing.start_ms, "endMs": timing.end_ms, "text": timing.text }))
+        .collect();
+    json_to_js(
+        ctx.env(),
+        &serde_json::json!({ "out": out, "bytes": synthesis.mp3.len(), "timings": timings }),
+    )
+}
+
 /// Reads the `{ backend, request }` pair with the upstream serde shapes.
 fn read_backend_request(ctx: &CallContext) -> Result<(media_voice::BackendCapability, media_voice::VoiceRequest)> {
     let arg = ctx
@@ -294,5 +345,7 @@ register_module![
     render_song,
     check_voice_request,
     voice_request_fingerprint,
+    readaloud_capability,
+    synthesize_remote,
     parse_word_timings
 ];

@@ -228,3 +228,39 @@ export interface WordTiming {
 export function parseWordTimings(srt: string): WordTiming[] {
     return native.parseWordTimings({ srt }).timings;
 }
+
+/**
+ * The backend declaration the native readaloud client implements.
+ *
+ * Pass it to `checkVoiceRequest` and `voiceRequestFingerprint` instead of
+ * hand-writing the remote service's identity.
+ */
+export function readaloudCapability(): VoiceBackend {
+    return native.readaloudCapability() as VoiceBackend;
+}
+
+/** One finished remote synthesis: the written file and its alignment. */
+export interface RemoteSynthesis {
+    out: string;
+    bytes: number;
+    timings: WordTiming[];
+}
+
+/**
+ * Synthesizes speech through the Edge readaloud service in native Rust.
+ *
+ * The request goes out over the workspace WebSocket stack; the MP3 is written
+ * to `out` and word boundaries come back in absolute stream time. A refused
+ * token is retried once with the server's clock, and a second refusal fails —
+ * nothing falls back to another voice. No Python and no external binary are
+ * involved on this path.
+ */
+export function synthesizeRemote(options: {
+    text: string;
+    voice: string;
+    ratePercent?: number;
+    wordBoundaries?: boolean;
+    out: string;
+}): RemoteSynthesis {
+    return native.synthesizeRemote(options);
+}

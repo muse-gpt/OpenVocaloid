@@ -44,6 +44,20 @@ export interface NativeWordTiming {
     text: string;
 }
 
+/** The upstream `BackendCapability` shape, as the native side serializes it. */
+export interface NativeVoiceBackend {
+    id: string;
+    version: string;
+    features: string[];
+    languages?: string[];
+    voices?: string[];
+    rate?: boolean;
+    streaming?: boolean;
+    timing?: string;
+    execution: { kind: string; service?: string; runtime?: string; unofficial?: boolean };
+    billing: { kind: string; unit?: string };
+}
+
 export interface NativeBinding {
     version(): string;
     vowelTable(): NativeVowelRow[];
@@ -53,6 +67,14 @@ export interface NativeBinding {
     renderSong(options: { spec: string; out: string }): NativeRenderResult;
     checkVoiceRequest(options: { backend: string; request: string }): true;
     voiceRequestFingerprint(options: { backend: string; request: string }): string;
+    readaloudCapability(): NativeVoiceBackend;
+    synthesizeRemote(options: {
+        text: string;
+        voice: string;
+        ratePercent?: number;
+        wordBoundaries?: boolean;
+        out: string;
+    }): { out: string; bytes: number; timings: NativeWordTiming[] };
     parseWordTimings(options: { srt: string }): { timings: NativeWordTiming[] };
 }
 
