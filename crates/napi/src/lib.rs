@@ -150,29 +150,6 @@ fn voice_request_fingerprint(ctx: CallContext) -> Result<JsValue> {
     ctx.env().string(&fingerprint)
 }
 
-/// Builds the `edge-tts` invocation for one request.
-///
-/// Argument: `{ python, text, voice, ratePercent, mediaOut, subtitleOut }`.
-/// Returns `{ program, args }`. Nothing is started here: the host decides
-/// whether the declared runtime is allowed to run, and the engine is addressed
-/// by module, not by a pinned script.
-#[function(js_name = "edgeTtsCommand")]
-fn edge_tts_command(ctx: CallContext) -> Result<JsValue> {
-    let arg = ctx
-        .args()
-        .first()
-        .copied()
-        .ok_or_else(|| Error::new("edgeTtsCommand requires an options object"))?;
-    let python = arg.get_named("python")?.as_string()?;
-    let text = arg.get_named("text")?.as_string()?;
-    let voice = arg.get_named("voice")?.as_string()?;
-    let rate = arg.get_named("ratePercent")?.as_f64().unwrap_or(0.0) as i32;
-    let media_out = arg.get_named("mediaOut")?.as_string()?;
-    let subtitle_out = arg.get_named("subtitleOut")?.as_string()?;
-    let command = media_voice::edge_tts_command(&python, &text, &voice, rate, std::path::Path::new(&media_out), std::path::Path::new(&subtitle_out));
-    json_to_js(ctx.env(), &serde_json::json!({ "program": command.program, "args": command.args }))
-}
-
 /// Parses the word-boundary SRT an engine reports into timings.
 ///
 /// Argument: `{ srt: string }`. Returns `{ timings: [{ startMs, endMs, text }] }`.
@@ -317,6 +294,5 @@ register_module![
     render_song,
     check_voice_request,
     voice_request_fingerprint,
-    edge_tts_command,
     parse_word_timings
 ];
