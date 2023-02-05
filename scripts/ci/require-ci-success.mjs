@@ -14,7 +14,7 @@
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-const REPO = process.env.GITHUB_REPOSITORY || process.env.OPEN_VOCALOID_GITHUB_REPO || '';
+const REPO = process.env.GITHUB_REPOSITORY || process.env.OPEN_VOICE_GITHUB_REPO || '';
 const TAG_SHA = String(process.env.TAG_SHA || process.argv.find((a) => a.startsWith('--sha='))?.slice(6) || '')
     .trim()
     .toLowerCase();

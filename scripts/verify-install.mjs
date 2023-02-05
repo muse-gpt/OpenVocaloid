@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Installed-state verification for OpenVocaloid.
+ * Installed-state verification for OpenVoice.
  *
  * Loads the library through its public entry (so the loader, the optional
  * platform package and the staged `.node` are all exercised), renders the
@@ -12,10 +12,10 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { nativeVersion, renderSong } from '../packages/open-vocaloid/dist/index.js';
+import { nativeVersion, renderSong } from '../packages/open-voice/dist/index.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const dir = mkdtempSync(path.join(tmpdir(), 'open-vocaloid-verify-'));
+const dir = mkdtempSync(path.join(tmpdir(), 'open-voice-verify-'));
 const out = path.join(dir, 'demo.wav');
 const repeat = path.join(dir, 'demo-repeat.wav');
 
@@ -26,7 +26,7 @@ const check = (name, ok, detail) => {
 };
 
 try {
-    check('module', path.basename(root) === 'OpenVocaloid', root);
+    check('module', path.basename(root) === 'OpenVoice', root);
     const version = nativeVersion();
     check('version', typeof version === 'string' && version.length > 0, version);
 

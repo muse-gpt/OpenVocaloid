@@ -1,12 +1,12 @@
 [package]
-name = "openvocaloid-napi"
+name = "openvoice-napi"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 authors.workspace = true
 repository.workspace = true
-description = "Node-API surface for OpenVocaloid"
+description = "Node-API surface for OpenVoice"
 
 [lib]
 crate-type = ["cdylib"]

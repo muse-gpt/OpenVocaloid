@@ -1,0 +1,21 @@
+{
+    "name": "@wae/open-voice-linux-arm64",
+    "version": "0.0.1",
+    "description": "OpenVoice native addon for Linux arm64",
+    "license": "Apache-2.0",
+    "os": ["linux"],
+    "cpu": ["arm64"],
+    "main": "./open-voice.linux-arm64.node",
+    "files": [
+        "open-voice.linux-arm64.node",
+        "README.md"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/muse-gpt/OpenVoice.git",
+        "directory": "packages/open-voice-linux-arm64"
+    }
+}

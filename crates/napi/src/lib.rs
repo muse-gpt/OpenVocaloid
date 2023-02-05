@@ -1,4 +1,4 @@
-//! Node-API surface for OpenVocaloid.
+//! Node-API surface for OpenVoice.
 //!
 //! Orthogonal small exports — one function per capability, library first:
 //! - [`version`]: binary version for host verification.
@@ -21,7 +21,7 @@ use media_types::SAMPLE_RATE;
 use media_voice::{Onset, VoiceSpec, Vowel};
 use wae::{CallContext, Env, Error, JsValue, Result, function, register_module};
 
-/// Library version used by `@wae/open-vocaloid` to verify the native binary.
+/// Library version used by `@wae/open-voice` to verify the native binary.
 #[function]
 fn version(ctx: CallContext) -> Result<JsValue> {
     ctx.env().string(env!("CARGO_PKG_VERSION"))

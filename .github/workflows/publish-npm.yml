@@ -1,6 +1,6 @@
 # Trusted Publisher contract (sole npm trusted workflow — keep this filename):
 #   file = publish-npm.yml
-#   repo = muse-gpt/vocaloid
+#   repo = muse-gpt/OpenVoice
 #   env  = NPM_PUBLISH
 #
 # Triggers:
@@ -116,7 +116,7 @@ jobs:
 
       - name: Build native (release)
         env:
-          OPEN_VOCALOID_TARGET: ${{ matrix.cross_target }}
+          OPEN_VOICE_TARGET: ${{ matrix.cross_target }}
         run: node scripts/build-napi.mjs
 
       - name: Stage native artifact
@@ -125,11 +125,11 @@ jobs:
           set -euo pipefail
           out="dist/${{ matrix.short }}"
           mkdir -p "$out"
-          named="open-vocaloid.${{ matrix.short }}.node"
-          src="packages/open-vocaloid-${{ matrix.short }}/$named"
+          named="open-voice.${{ matrix.short }}.node"
+          src="packages/open-voice-${{ matrix.short }}/$named"
           if [[ ! -f "$src" ]]; then
             echo "missing native binary at $src" >&2
-            ls -la "packages/open-vocaloid-${{ matrix.short }}" || true
+            ls -la "packages/open-voice-${{ matrix.short }}" || true
             exit 1
           fi
           cp "$src" "$out/$named"
@@ -195,13 +195,13 @@ jobs:
         run: |
           set -euo pipefail
           for short in win32-x64 linux-x64 linux-arm64 darwin-x64 darwin-arm64; do
-            src="dist/native-artifacts/native-$short/open-vocaloid.$short.node"
-            dest="packages/open-vocaloid-$short/open-vocaloid.$short.node"
+            src="dist/native-artifacts/native-$short/open-voice.$short.node"
+            dest="packages/open-voice-$short/open-voice.$short.node"
             if [[ ! -f "$src" ]]; then
               echo "missing native binary for $short ($src)" >&2
               exit 1
             fi
-            mkdir -p "packages/open-vocaloid-$short"
+            mkdir -p "packages/open-voice-$short"
             cp "$src" "$dest"
           done
 
@@ -229,8 +229,8 @@ jobs:
         run: |
           set -euo pipefail
           for short in win32-x64 linux-x64 linux-arm64 darwin-x64 darwin-arm64; do
-            pnpm --dir "packages/open-vocaloid-$short" publish --no-git-checks --access public --provenance
+            pnpm --dir "packages/open-voice-$short" publish --no-git-checks --access public --provenance
           done
 
       - name: Publish main package to npm
-        run: pnpm --dir packages/open-vocaloid publish --no-git-checks --access public --provenance
+        run: pnpm --dir packages/open-voice publish --no-git-checks --access public --provenance

@@ -1,5 +1,5 @@
 /**
- * Host ↔ platform-package map for OpenVocaloid native sidecars.
+ * Host ↔ platform-package map for OpenVoice native sidecars.
  *
  * Every build / stage / loader path must go through this module so the
  * supported matrix stays one place. Unsupported hosts fail here instead of
@@ -18,31 +18,31 @@ export const TARGETS = {
         platform: 'win32',
         arch: 'x64',
         triple: 'x86_64-pc-windows-msvc',
-        cdylib: 'openvocaloid_napi.dll',
+        cdylib: 'openvoice_napi.dll',
     },
     'x86_64-unknown-linux-gnu': {
         platform: 'linux',
         arch: 'x64',
         triple: 'x86_64-unknown-linux-gnu',
-        cdylib: 'libopenvocaloid_napi.so',
+        cdylib: 'libopenvoice_napi.so',
     },
     'aarch64-unknown-linux-gnu': {
         platform: 'linux',
         arch: 'arm64',
         triple: 'aarch64-unknown-linux-gnu',
-        cdylib: 'libopenvocaloid_napi.so',
+        cdylib: 'libopenvoice_napi.so',
     },
     'x86_64-apple-darwin': {
         platform: 'darwin',
         arch: 'x64',
         triple: 'x86_64-apple-darwin',
-        cdylib: 'libopenvocaloid_napi.dylib',
+        cdylib: 'libopenvoice_napi.dylib',
     },
     'aarch64-apple-darwin': {
         platform: 'darwin',
         arch: 'arm64',
         triple: 'aarch64-apple-darwin',
-        cdylib: 'libopenvocaloid_napi.dylib',
+        cdylib: 'libopenvoice_napi.dylib',
     },
 };
 
@@ -60,7 +60,7 @@ export function shortName(target) {
 }
 
 export function packageName(target) {
-    return `open-vocaloid-${shortName(target)}`;
+    return `open-voice-${shortName(target)}`;
 }
 
 export function scopedPackageName(target) {
@@ -68,7 +68,7 @@ export function scopedPackageName(target) {
 }
 
 export function nodeFileName(target) {
-    return `open-vocaloid.${shortName(target)}.node`;
+    return `open-voice.${shortName(target)}.node`;
 }
 
 export function packageDir(root, target) {
@@ -76,7 +76,7 @@ export function packageDir(root, target) {
 }
 
 export function usesExplicitTarget() {
-    return Boolean(process.env.OPEN_VOCALOID_TARGET);
+    return Boolean(process.env.OPEN_VOICE_TARGET);
 }
 
 function hostTriple() {
@@ -90,9 +90,9 @@ function hostTriple() {
     return triple;
 }
 
-/** `OPEN_VOCALOID_TARGET` selects an explicit Rust target triple. */
+/** `OPEN_VOICE_TARGET` selects an explicit Rust target triple. */
 export function resolveTarget() {
-    const triple = process.env.OPEN_VOCALOID_TARGET || hostTriple();
+    const triple = process.env.OPEN_VOICE_TARGET || hostTriple();
     const target = TARGETS[triple];
     if (!target) {
         throw new Error(
@@ -117,12 +117,12 @@ export function supportedShortNames() {
  * Builds the N-API cdylib for the resolved target and stages it into the
  * matching platform package.
  *
- * `OPEN_VOCALOID_TARGET` selects a cross target; otherwise the host target is
+ * `OPEN_VOICE_TARGET` selects a cross target; otherwise the host target is
  * used. A missing artifact is an error, never a silently skipped stage.
  */
 export function buildAndStage(root) {
     const target = resolveTarget();
-    const args = ['build', '-p', 'openvocaloid-napi', '--release'];
+    const args = ['build', '-p', 'openvoice-napi', '--release'];
     if (usesExplicitTarget()) {
         args.push('--target', target.triple);
     }

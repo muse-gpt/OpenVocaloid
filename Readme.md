@@ -1,4 +1,4 @@
-# OpenVocaloid — vocal synthesis product
+# OpenVoice — vocal synthesis product
 
 **Vocal synthesis in the broad sense, not a VOCALOID clone.** Paired with
 [OpenSFX](../OpenSFX) (procedural sound effects): one synthesizes voices, the
@@ -14,7 +14,7 @@ VOCALOID 6 AI, and so on. Broadly, every commercial singing-synthesis product
 hand-made VOCALOID and AI singing-voice conversion (SVC) come from the other
 lineage where people extract and splice their own material.
 
-OpenVocaloid does not clone any single product; it builds an **engine-agnostic
+OpenVoice does not clone any single product; it builds an **engine-agnostic
 vocal synthesis product**:
 
 - **Input contract**: score and note durations, lyrics as syllables (onset class
@@ -30,21 +30,21 @@ vocal synthesis product**:
 
 ```bash
 pnpm build
-node packages/open-vocaloid/dist/cli/main.js demo --output ./out/demo.wav
-node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav
-node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav --seed 2 --tempo 100 --volume 0.5
-node packages/open-vocaloid/dist/cli/main.js sing ./song.json --output ./out/song.wav --breath 0.2 --vibrato 5.5,0.12,0.25
-node packages/open-vocaloid/dist/cli/main.js validate ./song.json
-node packages/open-vocaloid/dist/cli/main.js verify ./song.json --json
-node packages/open-vocaloid/dist/cli/main.js info
-node packages/open-vocaloid/dist/cli/main.js validate ./song.json --json
-node packages/open-vocaloid/dist/cli/main.js info --json
+node packages/open-voice/dist/cli/main.js demo --output ./out/demo.wav
+node packages/open-voice/dist/cli/main.js sing ./song.json --output ./out/song.wav
+node packages/open-voice/dist/cli/main.js sing ./song.json --output ./out/song.wav --seed 2 --tempo 100 --volume 0.5
+node packages/open-voice/dist/cli/main.js sing ./song.json --output ./out/song.wav --breath 0.2 --vibrato 5.5,0.12,0.25
+node packages/open-voice/dist/cli/main.js validate ./song.json
+node packages/open-voice/dist/cli/main.js verify ./song.json --json
+node packages/open-voice/dist/cli/main.js info
+node packages/open-voice/dist/cli/main.js validate ./song.json --json
+node packages/open-voice/dist/cli/main.js info --json
 ```
 
 As a library (small orthogonal functions):
 
 ```ts
-import { renderSong, validateSong, songInfo, listVowels, listOnsets } from '@wae/open-vocaloid';
+import { renderSong, validateSong, songInfo, listVowels, listOnsets } from '@wae/open-voice';
 
 const spec = {
     syllables: [{ onset: 'r', vowel: 'a', pitch: 392.0, beats: 1.0 }],

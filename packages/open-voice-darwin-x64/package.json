@@ -1,0 +1,21 @@
+{
+    "name": "@wae/open-voice-darwin-x64",
+    "version": "0.0.1",
+    "description": "OpenVoice native addon for macOS x64",
+    "license": "Apache-2.0",
+    "os": ["darwin"],
+    "cpu": ["x64"],
+    "main": "./open-voice.darwin-x64.node",
+    "files": [
+        "open-voice.darwin-x64.node",
+        "README.md"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/muse-gpt/OpenVoice.git",
+        "directory": "packages/open-voice-darwin-x64"
+    }
+}
