@@ -1,8 +1,25 @@
-node_modules/
+# OS
+
+# IDE
+.idea/
+*.iml
+*.log
+*.txt
+
+# Rust
 target/
 .cargo/
+
+# Node
+node_modules/
 dist/
 out/
 *.node
+*.wasm
+
+# OpenVoice
 *.wav
-.idea/
+
+# Nifty local cache
+.env.placeholder.local
+.cache/

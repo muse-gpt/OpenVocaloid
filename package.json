@@ -1,15 +1,18 @@
 {
-    "name": "open-vocaloid-workspace",
+    "name": "open-voice-workspace",
     "private": true,
     "type": "module",
     "packageManager": "pnpm@10.15.0",
     "scripts": {
         "build": "pnpm run build:napi && pnpm run build:ts",
-        "build:ts": "pnpm --filter @wae/open-vocaloid run build",
+        "build:ts": "pnpm --filter @wae/open-voice run build",
         "build:napi": "node scripts/build-napi.mjs",
-        "typecheck": "pnpm --filter @wae/open-vocaloid run typecheck",
+        "typecheck": "pnpm --filter @wae/open-voice run typecheck",
         "verify": "node scripts/verify-install.mjs",
-        "demo": "node packages/open-vocaloid/dist/cli/main.js demo --output ./out/demo.wav",
-        "info": "node packages/open-vocaloid/dist/cli/main.js info"
+        "demo": "node packages/open-voice/dist/cli/main.js demo --output ./out/demo.wav",
+        "info": "node packages/open-voice/dist/cli/main.js info"
+    },
+    "devDependencies": {
+        "@doki-land/nifty": "^0.1.10"
     }
 }
