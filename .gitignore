@@ -8,7 +8,7 @@
 
 # Rust
 target/
-.cargo/
+.cargo/config.toml
 
 # Node
 node_modules/
@@ -23,3 +23,6 @@ out/
 # Nifty local cache
 .env.placeholder.local
 .cache/
+
+# npm secrets (nifty)
+.secrets/
