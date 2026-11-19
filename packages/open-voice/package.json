@@ -1,6 +1,6 @@
 {
     "name": "@wae/open-voice",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "Vocal synthesis: deterministic formant songs from syllable specs, WAV export — a library first, the CLI is a thin shell",
     "license": "Apache-2.0",
     "type": "module",

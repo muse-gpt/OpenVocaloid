@@ -1,6 +1,6 @@
 {
     "name": "@wae/open-voice-linux-x64",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "OpenVoice native addon for Linux x64",
     "license": "Apache-2.0",
     "os": ["linux"],

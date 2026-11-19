@@ -229,8 +229,14 @@ jobs:
         run: |
           set -euo pipefail
           for short in win32-x64 linux-x64 linux-arm64 darwin-x64 darwin-arm64; do
-            pnpm --dir "packages/open-voice-$short" publish --no-git-checks --access public --provenance
+            (cd "packages/open-voice-$short" && npm publish --access public --provenance)
           done
 
       - name: Publish main package to npm
-        run: pnpm --dir packages/open-voice publish --no-git-checks --access public --provenance
+        shell: bash
+        env:
+          VERSION: ${{ needs.provenance.outputs.version }}
+        run: |
+          set -euo pipefail
+          pnpm --dir packages/open-voice pack --pack-destination "$RUNNER_TEMP"
+          npm publish "$RUNNER_TEMP"/wae-open-voice-"$VERSION".tgz --access public --provenance
