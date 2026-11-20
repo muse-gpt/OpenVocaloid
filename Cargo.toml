@@ -18,10 +18,10 @@ wae = { git = "https://github.com/doki-land/wae-framework.git", rev = "f92f818fd
 # The singing-voice domain, the scene-free voice export entry and the shared
 # sample rate live in the media.rs tree. The revision is pinned to a full
 # 40-character commit so this repo builds from exactly one upstream source.
-media-voice = { git = "https://github.com/oovm/boost.rs.git", rev = "00546431323136c094fa68b13edbdbfff7047683" }
-media-render = { git = "https://github.com/oovm/boost.rs.git", rev = "00546431323136c094fa68b13edbdbfff7047683", default-features = false, features = ["voice-export"] }
-media-harness = { git = "https://github.com/oovm/boost.rs.git", rev = "00546431323136c094fa68b13edbdbfff7047683" }
-media-types = { git = "https://github.com/oovm/boost.rs.git", rev = "00546431323136c094fa68b13edbdbfff7047683" }
+media-voice = { git = "https://github.com/oovm/boost.rs.git", rev = "5e859e3fc3ef50e3304bd766b8b4058541df325b" }
+media-render = { git = "https://github.com/oovm/boost.rs.git", rev = "5e859e3fc3ef50e3304bd766b8b4058541df325b", default-features = false, features = ["voice-export"] }
+media-harness = { git = "https://github.com/oovm/boost.rs.git", rev = "5e859e3fc3ef50e3304bd766b8b4058541df325b" }
+media-types = { git = "https://github.com/oovm/boost.rs.git", rev = "5e859e3fc3ef50e3304bd766b8b4058541df325b" }
 
 [profile.release]
 lto = true
